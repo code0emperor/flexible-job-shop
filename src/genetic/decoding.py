@@ -44,6 +44,7 @@ def find_first_available_place(start_ctr, duration, machine_jobs):
     for job in machine_jobs:
         start = job[3]
         long = job[1]
+        # print(start, "\n", long)
         for k in range(start, start + long):
             machine_used[k] = False
 

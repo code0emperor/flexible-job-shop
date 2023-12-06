@@ -172,7 +172,7 @@ def crossover(population, parameters):
         (OS1, MS1) = population[i]
         (OS2, MS2) = population[i+1]
 
-        if random.random() < config.pc:
+        if random.random() < parameters['pc']:
             (oOS1, oOS2) = crossoverOS(OS1, OS2, parameters)
             (oMS1, oMS2) = crossoverMS(MS1, MS2)
             newPop.append((oOS1, oMS1))
@@ -269,7 +269,7 @@ def mutation(population, parameters):
     newPop = []
 
     for (OS, MS) in population:
-        if random.random() < config.pm:
+        if random.random() < parameters['pm']:
             oOS = mutationOS(OS)
             oMS = mutationMS(MS, parameters)
             newPop.append((oOS, oMS))
