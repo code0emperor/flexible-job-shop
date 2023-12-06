@@ -39,9 +39,6 @@ def initializePopulation(parameters):
     for i in range(config.popSize):
         OS = generateOS(parameters)
         MS = generateMS(parameters)
-        if(i<=2):
-            print(OS)
-            print(MS)
         gen1.append((OS, MS))
     # print(gen1)
     return gen1

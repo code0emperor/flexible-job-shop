@@ -31,7 +31,7 @@ else:
     parameters['pm'] = config.pm
 
     # Evaluate the population
-    while not termination.shouldTerminate(population, gen):
+    while not termination.shouldTerminate(gen):
         # Genetic Operators
         population = genetic.selection(population, parameters)
         population = genetic.crossover(population, parameters)

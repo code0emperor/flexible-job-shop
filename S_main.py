@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import time
@@ -9,6 +9,34 @@ from src.utils import parser, gantt
 from src.genetic import encoding, decoding, genetic, termination
 from src import config
 
+def get_pc_pm_values(idx, parameters):
+    random_float = random.random()
+    random_scaled = random_float * config.pc_interval
+    parameters['pc'] = config.possible_pc_values[idx] + random_scaled
+
+    random_float = random.random()
+    random_scaled = random_float * config.pm_interval
+    parameters['pm'] = config.possible_pm_values[idx] + random_scaled
+
+    return parameters
+
+def calculate_state(makespans, prevMakespans):
+    f_star = np.sum(makespans)/np.sum(prevMakespans)
+    d_star = np.sum(makespans - np.mean(makespans))/np.sum(prevMakespans - np.mean(prevMakespans))
+    m_star = np.max(makespans)/np.max(prevMakespans)
+
+    S_star = (config.w1 * f_star) + (config.w2 * d_star) + (config.w3 * m_star)
+
+    for i in range(1,20):
+        if S_star < config.set_states[i]:
+            return i-1
+    return 19
+
+def calculateRewards(makespans, prevMakespans):
+    r_c = (np.max(makespans) - np.max(prevMakespans))/np.max(prevMakespans)
+    r_m = (np.sum(makespans) - np.sum(prevMakespans))/np.sum(prevMakespans)
+
+    return (config.wc*r_c) + (config.wm*r_m)
 
 # Beginning
 if len(sys.argv) != 2:
@@ -20,57 +48,68 @@ else:
     # print(parameters)
 
     t0 = time.time()
-    print(t0)
 
     # Initialize the Population
     population = encoding.initializePopulation(parameters)
-    gen = 1
+    firstPop = population
+    gen = 0
 
-    Q_values = np.zeros((len(config.possible_pc_values), 
-                         len(config.possible_pm_values)))
+    Q_values = np.zeros((len(config.set_states), len(config.possible_pm_values)))
+    
+    makespans = [genetic.timeTaken(individual, parameters) 
+                     for individual in population]
+    
+    action_t = random.randrange(10)
+
+    firstMakespans = [genetic.timeTaken(individual, parameters) 
+                       for individual in firstPop]
+    state_t = calculate_state(makespans, firstMakespans)
 
     # SARSA parameters
     alpha = 0.1  # learning rate
     gamma = 0.9  # discount factor
 
     # Evaluate the population
-    while not termination.shouldTerminate(population, gen):
+    while not termination.shouldTerminate(gen):
+        prevMakespans = makespans
+
+        # Getting new parameter values
+        parameters = get_pc_pm_values(action_t, parameters)
+
         # Genetic Operators
-
-        # Find best Pc and Pm states based on Q-values
-        best_pc_state = np.argmax(np.max(Q_values, axis=1))
-        best_pm_state = np.argmax(Q_values[best_pc_state, :])
-
-        # Update crossover and mutation parameters based on best states
-        random_float = random.random()
-        random_scaled = random_float * config.pc_interval
-        parameters['pc'] = config.possible_pc_values[best_pc_state] + random_scaled
-
-        random_float = random.random()
-        random_scaled = random_float * config.pm_interval
-        parameters['pm'] = config.possible_pm_values[best_pm_state] + random_scaled
-
         population = genetic.selection(population, parameters)
         population = genetic.crossover(population, parameters)
         population = genetic.mutation(population, parameters)
 
-        # Evaluate the population
+        # Evaluate the fitness
         makespans = [genetic.timeTaken(individual, parameters) 
                      for individual in population]
-
-        # Calculate rewards based on makespans
-        rewards = [1 / makespan for makespan in makespans]
-
-        # Update Q-values using SARSA
-        for j, pc_value in enumerate(config.possible_pc_values):
-            for k, pm_value in enumerate(config.possible_pm_values):
-                Q_values[j, k] = (1 - alpha) * Q_values[j, k] 
-                + alpha * (np.mean(rewards) + gamma * np.argmax(Q_values))
         
-        # Adjust probability parameters based on Q-values
-        pc_index, pm_index = np.unravel_index(np.argmax(Q_values), Q_values.shape)
+        # Calculate rewards based on makespans
+        reward_t_1 = calculateRewards(makespans, prevMakespans)
 
-        gen = gen + 10.
+        # Calculate new State
+        state_t_1 = calculate_state(makespans, firstMakespans)
+
+        # Choosing action with epsilon-greedy
+        random_num = random.uniform(0.00, 1.00)
+        random_action = random.randrange(10)
+
+        # Epsilon-greedy Approach
+        action_t_1 = np.argmax(Q_values[state_t_1]) if (config.epsilon >= random_num) else random_action
+
+        print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
+        # Update Q-values using SARSA
+        Q_values[state_t][action_t] = (1 - alpha) * Q_values[state_t, action_t] \
+                            + alpha * (reward_t_1 + gamma * Q_values[state_t_1, action_t_1])
+
+        # Updating current state
+        state_t = state_t_1
+
+        # Executing new action
+        action_t = action_t_1
+
+        gen = gen + 1.
 
     sortedPop = sorted(population, key=lambda cpl: genetic.timeTaken(cpl, parameters))
 
@@ -81,17 +120,9 @@ else:
     # Termination Criteria Satisfied ?
     gantt_data = decoding.translate_decoded_to_gantt(decoding.decode(parameters, sortedPop[0][0], sortedPop[0][1]))
 
-    # if config.latex_export:
-    #     # print("#################################")
-    #     gantt.export_latex(gantt_data)
-    # else:
-    #     gantt.draw_chart(gantt_data)
     gantt.draw_chart(gantt_data)
 
-    for i in range(5):
-        for j in range(5):
-            for k in range(5):
-                print(f"pr_value = {config.possible_pr_values[i]},
-                       pc_value = {config.possible_pc_values[j]},
-                         pm_value = {config.possible_pm_values[k]},
-                           Q[{i}][{j}][{k}] = {Q_values[i][j][k]}")
+    for i in range(20):
+        for j in range(10):
+            print(f"Q[{i}][{j}] = {Q_values[i][j]}")
+                

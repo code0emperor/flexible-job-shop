@@ -6,5 +6,5 @@
 from src import config
 
 
-def shouldTerminate(population, gen):
+def shouldTerminate(gen):
     return gen > config.maxGen

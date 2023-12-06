@@ -28,7 +28,7 @@ def calculate_state(makespans, prevMakespans):
     S_star = (config.w1 * f_star) + (config.w2 * d_star) + (config.w3 * m_star)
 
     for i in range(1,20):
-        if S_star < config.set_states[i]:
+        if S_star < config.states[i]:
             return i-1
     return 19
 
@@ -54,7 +54,7 @@ else:
     firstPop = population
     gen = 0
 
-    Q_values = np.zeros((len(config.set_states), len(config.possible_pm_values)))
+    Q_values = np.zeros((len(config.states), len(config.possible_pm_values)))
     
     makespans = [genetic.timeTaken(individual, parameters) 
                      for individual in population]
@@ -95,17 +95,28 @@ else:
         random_num = random.uniform(0.00, 1.00)
         random_action = random.randrange(10)
 
-        # Greedy Approach
-        action_t_1 = np.argmax(Q_values[state_t_1])
+        action_t_1 = 0
+
+        ## SARSA
+        if(gen < (len(config.states) * len(config.possible_pc_values) / 2)):
+            action_t_1 = np.argmax(Q_values[state_t_1]) if (config.epsilon >= random_num) else random_action
+
+            # Update Q-values using SARSA
+            Q_values[state_t][action_t] = (1 - alpha) * Q_values[state_t, action_t] \
+                                + alpha * (reward_t_1 + gamma * Q_values[state_t_1, action_t_1])
+        ## Q-LEARNING
+        else:
+            # Greedy Approach
+            action_t_1 = np.argmax(Q_values[state_t_1])
+
+            # Update Q-values using Q-Learning
+            Q_values[state_t, action_t] = (1 - alpha) * Q_values[state_t, action_t] \
+                                + alpha * (reward_t_1 + gamma * np.max(Q_values[state_t_1, :]))
+
+            # Updating a_t+1 with epsilon greedy approach
+            action_t_1 = np.argmax(Q_values[state_t_1]) if (config.epsilon >= random_num) else random_action
 
         print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
-        # Update Q-values using Q-Learning
-        Q_values[state_t, action_t] = (1 - alpha) * Q_values[state_t, action_t] \
-                            + alpha * (reward_t_1 + gamma * np.max(Q_values[state_t_1, :]))
-
-        # Updating a_t+1 with epsilon greedy approach
-        action_t_1 = np.argmax(Q_values[state_t_1]) if (config.epsilon >= random_num) else random_action
-
         # Updating current state
         state_t = state_t_1
 
