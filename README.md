@@ -40,4 +40,5 @@ Test data can be found on [this site](http://people.idsia.ch/~monaldo/fjsp.html)
 ## References 
 
 [1] Xinyu Li and Liang Gao. An effective hybrid genetic algorithm and tabu searchfor  flexible  job  shop  scheduling  problem.International  Journal  of  ProductionEconomics, 174 :93 – 110, 2016
+
 [2] Ronghua Chen, Bo Yang, Shi Li and Shilong Wang. A self-learning genetic algorithm based on reinforcement learning for flexible job-shop scheduling problem. Computers & Industrial Engineering, 149 : 2020, 106778
