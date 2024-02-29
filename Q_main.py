@@ -75,12 +75,19 @@ else:
     total_time = t1 - t0
     print("Finished in {0:.2f}s".format(total_time))
 
+    makespans = [genetic.timeTaken(individual, parameters) 
+                     for individual in population]
+
+    print(makespans)
+    print(np.min(makespans))
+    print(np.average(makespans))
+
     # Termination Criteria Satisfied ?
     gantt_data = decoding.translate_decoded_to_gantt(decoding.decode(parameters, sortedPop[0][0], sortedPop[0][1]))
 
-    gantt.draw_chart(gantt_data)
+    # gantt.draw_chart(gantt_data)
 
-    for i in range(20):
-        for j in range(10):
-            print(f"Q[{i}][{j}] = {Q_values[i][j]}")
+    # for i in range(20):
+    #     for j in range(10):
+    #         print(f"Q[{i}][{j}] = {Q_values[i][j]}")
                 

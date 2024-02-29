@@ -5,6 +5,7 @@
 
 import sys
 import time
+import numpy as np
 
 from src.utils import parser, gantt
 from src.genetic import encoding, decoding, genetic, termination
@@ -45,6 +46,13 @@ else:
     total_time = t1 - t0
     print("Finished in {0:.2f}s".format(total_time))
 
+    makespans = [genetic.timeTaken(individual, parameters) 
+                     for individual in population]
+
+    print(makespans)
+    print(np.min(makespans))
+    print(np.average(makespans))
+
     # Termination Criteria Satisfied ?
     gantt_data = decoding.translate_decoded_to_gantt(decoding.decode(parameters, sortedPop[0][0], sortedPop[0][1]))
 
@@ -53,4 +61,4 @@ else:
     #     gantt.export_latex(gantt_data)
     # else:
     #     gantt.draw_chart(gantt_data)
-    gantt.draw_chart(gantt_data)
+    # gantt.draw_chart(gantt_data)

@@ -8,14 +8,15 @@ from src import config
 
 def generateOS(parameters):
     jobs = parameters['jobs']
-
+    # print(jobs)
     OS = []
     i = 0
     for job in jobs:
+        print("job:",job)
         for op in job:
             OS.append(i)
         i = i+1
-
+    print(OS)
     random.shuffle(OS)
 
     return OS

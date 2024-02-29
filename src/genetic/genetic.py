@@ -18,6 +18,7 @@ def timeTaken(os_ms, pb_instance):
     for machine in decoded:
         max_d = 0
         for job in machine:
+            # print("job:",job)
             end = job[3] + job[1]
             if end > max_d:
                 max_d = end
@@ -168,7 +169,7 @@ def crossoverMS(p1, p2):
 def crossover(population, parameters):
     newPop = []
     i = 0
-    while i < len(population):
+    while i < len(population)-1:
         (OS1, MS1) = population[i]
         (OS2, MS2) = population[i+1]
 

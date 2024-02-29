@@ -23,6 +23,7 @@ else:
 
     # Initialize the Population
     population = encoding.initializePopulation(parameters)
+    # print(population)
     firstPop = population
     gen = 0
 
@@ -59,8 +60,6 @@ else:
         # Calculate new State
         state_t_1 = learning.calculate_state(makespans, firstMakespans)
 
-        action_t_1 = 0
-
         ## SARSA
         if(gen < (len(config.states) * len(config.possible_pc_values) / 2)):
             Q_values, action_t_1 = learning.sarsa(state_t, action_t, Q_values, state_t_1, reward_t_1)
@@ -82,12 +81,20 @@ else:
     total_time = t1 - t0
     print("Finished in {0:.2f}s".format(total_time))
 
+    makespans = [genetic.timeTaken(individual, parameters) 
+                     for individual in population]
+
+    print(makespans)
+    print(np.min(makespans))
+    print(np.average(makespans))
+    print(Q_values.shape)
+
     # Termination Criteria Satisfied ?
     gantt_data = decoding.translate_decoded_to_gantt(decoding.decode(parameters, sortedPop[0][0], sortedPop[0][1]))
 
-    gantt.draw_chart(gantt_data)
+    # gantt.draw_chart(gantt_data)
 
-    for i in range(20):
-        for j in range(10):
-            print(f"Q[{i}][{j}] = {Q_values[i][j]}")
+    # for i in range(20):
+    #     for j in range(10):
+    #         print(f"Q[{i}][{j}] = {Q_values[i][j]}")
                 

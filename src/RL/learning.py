@@ -60,7 +60,10 @@ def sarsa(state_t, action_t, Q_values, state_t_1, reward_t_1):
 
     print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
     # Update Q-values using SARSA
-    Q_values[state_t][action_t] = (1 - config.alpha) * Q_values[state_t, action_t] \
+    Q_values[state_t, action_t] = (1 - config.alpha) * Q_values[state_t, action_t] \
                         + config.alpha * (reward_t_1 + config.gamma * Q_values[state_t_1, action_t_1])
     
     return Q_values, action_t_1
+
+def deepQLearning():
+    return None
