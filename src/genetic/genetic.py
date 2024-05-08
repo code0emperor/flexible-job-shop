@@ -18,7 +18,9 @@ def timeTaken(os_ms, pb_instance):
     for machine in decoded:
         max_d = 0
         for job in machine:
-            # print("job:",job)
+            print("job:",job)
+            print("job[3]:",job[3])
+            print("job[1]:",job[1])
             end = job[3] + job[1]
             if end > max_d:
                 max_d = end

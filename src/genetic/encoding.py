@@ -16,8 +16,8 @@ def generateOS(parameters):
         for op in job:
             OS.append(i)
         i = i+1
-    print(OS)
     random.shuffle(OS)
+    print(OS)
 
     return OS
 
