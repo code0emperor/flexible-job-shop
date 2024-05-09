@@ -40,7 +40,7 @@ def qLearning(state_t, action_t, Q_values, state_t_1, reward_t_1):
     # Greedy Approach
     action_t_1 = np.argmax(Q_values[state_t_1])
 
-    # print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
+    print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
     # Update Q-values using Q-Learning
     Q_values[state_t, action_t] = (1 - config.alpha) * Q_values[state_t, action_t] \
                         + config.alpha * (reward_t_1 + config.gamma * np.max(Q_values[state_t_1, :]))
@@ -58,7 +58,7 @@ def sarsa(state_t, action_t, Q_values, state_t_1, reward_t_1):
     # Epsilon-greedy Approach
     action_t_1 = np.argmax(Q_values[state_t_1]) if (config.epsilon >= random_num) else random_action
 
-    # print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
+    print(f"action_t_1 = {action_t_1} random_num = {random_num}, random_action = {random_action}")
     # Update Q-values using SARSA
     Q_values[state_t, action_t] = (1 - config.alpha) * Q_values[state_t, action_t] \
                         + config.alpha * (reward_t_1 + config.gamma * Q_values[state_t_1, action_t_1])

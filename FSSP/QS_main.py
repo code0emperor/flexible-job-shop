@@ -74,7 +74,14 @@ else:
         r_t_1 =learning.calculateRewards(makespans, prev_makespans)
         s_t_1 = learning.calculate_state(makespans, first_makespans)
 
-        Q_values, a_t_1 = learning.qLearning(s_t, a_t, Q_values, s_t_1, r_t_1)
+        a_t_1 = 0
+
+        ## SARSA
+        if(gen < (len(config.states) * len(config.possible_pc_values) / 2)):
+            Q_values, a_t_1 = learning.sarsa(s_t, a_t, Q_values, s_t_1, r_t_1)
+        ## Q-LEARNING
+        else:
+            Q_values, a_t_1 = learning.qLearning(s_t, a_t, Q_values, s_t_1, r_t_1)
 
         s_t = s_t_1
         a_t = a_t_1

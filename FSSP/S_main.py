@@ -5,8 +5,7 @@ import numpy as np
 
 from Utils import parser, config
 from Genetic import encoding, genetic
-from src.RL import learning
-
+from Rl import learning
 
 # Beginning
 if len(sys.argv) != 2:
@@ -14,27 +13,37 @@ if len(sys.argv) != 2:
 else:
     # Parameters Setting
     parameters = parser.parse(sys.argv[1])
+    t0 = time.time()
 
     # Initialize the Population
     population = encoding.initializePopulation(parameters)
     gen = 1
 
     # print(population)
-
     # parameters['pc'] = config.pc
     # parameters['pm'] = config.pm
 
-    action_t = random.randrange(10)
     Q_values = np.zeros((len(config.states), len(config.possible_pm_values)))
 
-    t0 = time.time()
+    makespans = [genetic.calc_makespan(individual, parameters['jobs'], len(parameters['jobs']), parameters['machinesNb'])
+                 for individual in population]
+    
+    # print(makespans)
+    a_t = random.randrange(10)
+
+    first_makespans = [genetic.calc_makespan(individual, parameters['jobs'], len(parameters['jobs']), parameters['machinesNb'])
+                 for individual in population]
+
+    s_t = learning.calculate_state(makespans, first_makespans)
 
     for eval in range(config.maxGen):
+        prev_makespans = makespans
+
+        parameters = learning.get_pc_pm_values(a_t, parameters)
+
         #selection
         parents = genetic.select_parent(population, parameters)
         children = []
-
-        parameters = learning.get_pc_pm_values(action_t, parameters)
 
         #crossover
         for parent in parents:
@@ -58,6 +67,21 @@ else:
         children.extend(mutatedChildren)
         if(len(children)) > 0:
             genetic.update_population(population, children, parameters)
+
+        makespans = [genetic.calc_makespan(individual, parameters['jobs'], len(parameters['jobs']), parameters['machinesNb'])
+                 for individual in population]
+        
+        r_t_1 =learning.calculateRewards(makespans, prev_makespans)
+        s_t_1 = learning.calculate_state(makespans, first_makespans)
+
+        Q_values, a_t_1 = learning.sarsa(s_t, a_t, Q_values, s_t_1, r_t_1)
+
+        s_t = s_t_1
+        a_t = a_t_1
+        if(a_t > 9):
+            a_t = 9
+
+        gen = gen+1
     
     t1 = time.time()
 
@@ -65,6 +89,7 @@ else:
     for individual in population:
         indMakespan = (genetic.calc_makespan(individual, parameters['jobs'], len(parameters['jobs']), parameters['machinesNb']), individual)
         costedPop.append(indMakespan)
+        print(indMakespan)
     costedPop.sort(key=lambda x: x[0])
 
     avgObjective = sum(cost[0] for cost in costedPop) / len(costedPop)
