@@ -1,7 +1,7 @@
 import random
 import numpy as np
 
-from Utils import config
+from utils import config
 
 def get_pc_pm_values(idx, parameters):
     random_float = random.random()
