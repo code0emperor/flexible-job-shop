@@ -44,7 +44,8 @@ python FSSP/S_main.py FSSP/testData/tai20_10.txt
 python FSSP/QS_main.py FSSP/testData/tai20_10.txt
 ```
 
-Test data can be found on [this site](http://people.idsia.ch/~monaldo/fjsp.html).
+FJSP dataset can be found on [this site](http://people.idsia.ch/~monaldo/fjsp.html).
+FSSP dataset: [site](http://mistic.heig-vd.ch/taillard/problemes.dir/ordonnancement.dir/ordonnancement.html)
 
 ## References 
 
