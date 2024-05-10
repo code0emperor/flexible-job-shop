@@ -35,6 +35,15 @@ $ python3 S_main.py test_data/Brandimarte_Data/Text/Mk02.fjs ## for SARSA on GA 
 $ python3 SQ_main.py test_data/Brandimarte_Data/Text/Mk02.fjs ## for SARSA and Q-learning on GA on FJSP
 ```
 
+To run the FSSP problem, stay in the flexible-job-shop directory, and run the following commands.
+
+```
+python FSSP/main.py FSSP/testData/tai20_10.txt
+python FSSP/Q_main.py FSSP/testData/tai20_10.txt
+python FSSP/S_main.py FSSP/testData/tai20_10.txt
+python FSSP/QS_main.py FSSP/testData/tai20_10.txt
+```
+
 Test data can be found on [this site](http://people.idsia.ch/~monaldo/fjsp.html).
 
 ## References 
